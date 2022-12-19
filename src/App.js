@@ -1,23 +1,33 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import Products from "./components/Products";
+import Filter from "./components/Filter";
+import Cart from "./components/Cart";
+import { fetchProducts } from "./myredux";
 
 function App() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+    <div className="grid-container">
+      <header>
+        <a href="/">Sneha Online Fashion Store</a>
       </header>
+      <main>
+        <div className="content">
+          <div className="main">
+            <Filter />
+            <Products />
+          </div>
+          <div className="sidebar">
+            <Cart />
+          </div>
+        </div>
+      </main>
+      <footer>All right is reserved</footer>
     </div>
   );
 }
