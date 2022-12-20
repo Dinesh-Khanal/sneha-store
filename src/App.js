@@ -3,14 +3,13 @@ import { useDispatch } from "react-redux";
 import Products from "./components/Products";
 import Filter from "./components/Filter";
 import Cart from "./components/Cart";
-import { fetchProducts } from "./myredux";
+import { fetchProducts } from "./redux/productSlice";
 
 function App() {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
-
   return (
     <div className="grid-container">
       <header>

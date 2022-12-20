@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import formatCurrency from "../util";
 import Modal from "react-modal";
-//import Fade from "react-reveal/Fade";
-//import Zoom from "react-reveal/Zoom";
 import { useSelector, useDispatch } from "react-redux";
-import { removeFromCart, createOrder, clearCart, clearOrder } from "../myredux";
-//import MyPayPal from "./MyPayPal";
+import { removeFromCart, clearCart } from "../redux/cartSlice";
+import { createOrder, clearOrder } from "../redux/orderSlice";
+import shortid from "shortid";
 
 const Cart = () => {
   const cartItems = useSelector((state) => state.cart.cartItems);
@@ -22,13 +21,14 @@ const Cart = () => {
     setCustomer({ ...customer, [e.target.name]: e.target.value });
   };
   const handleSubmit = (event) => {
-    //event.preventDefault(); payPal checkout btn does not submit form so comment out it.
     const newOrder = {
+      _id: shortid.generate(),
       name: customer.name,
       email: customer.email,
       address: customer.address,
       cartItems,
       total: totalPrice,
+      createdAt: Date.now(),
     };
     dispatch(createOrder(newOrder));
     dispatch(clearCart());
@@ -69,7 +69,7 @@ const Cart = () => {
               </li>
               <li>
                 <div>Date:</div>
-                <div>{order.createdAt}</div>
+                <div>{new Date(order.createdAt).toDateString()}</div>
               </li>
               <li>
                 <div>Total:</div>
@@ -79,7 +79,7 @@ const Cart = () => {
                 <div>Cart Items:</div>
                 <div>
                   {order.cartItems.map((x) => (
-                    <div>
+                    <div key={x._id}>
                       {x.count} {" x "} {x.title}
                     </div>
                   ))}
@@ -102,7 +102,7 @@ const Cart = () => {
                   <div className="right">
                     {formatCurrency(item.price)} X {item.count}{" "}
                     <button
-                      onClick={() => dispatch(removeFromCart(item))}
+                      onClick={() => dispatch(removeFromCart(item._id))}
                       className="button"
                     >
                       Remove
@@ -169,9 +169,6 @@ const Cart = () => {
                   <button className="button primary" type="submit">
                     Checkout
                   </button>
-                  {/* <div className="payPal-btn">
-                      <MyPayPal submit={handleSubmit} totalPrice={totalPrice} />
-                    </div> */}
                 </li>
               </ul>
             </form>

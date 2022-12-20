@@ -2,14 +2,26 @@ import React, { useState } from "react";
 import formatCurrency from "../util";
 import Modal from "react-modal";
 import { useSelector, useDispatch } from "react-redux";
-import { addToCart } from "../myredux";
+import Zoom from "react-reveal/Zoom";
+import { addToCart } from "../redux/cartSlice";
 
 const Products = () => {
-  const products = useSelector((state) => state.products.filteredItems);
+  const { products, sort, size, status } = useSelector(
+    (state) => state.products
+  );
+  const dispatch = useDispatch();
   const [product, setProduct] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const dispatch = useDispatch();
-
+  const filteredProducts =
+    size === ""
+      ? products.slice()
+      : products.filter((p) => p.availableSizes.includes(size));
+  if (sort === "lowest") {
+    filteredProducts.sort((a, b) => a.price - b.price);
+  }
+  if (sort === "highest") {
+    filteredProducts.sort((a, b) => b.price - a.price);
+  }
   const openModal = (product) => {
     setProduct(product);
     setModalOpen(true);
@@ -20,11 +32,11 @@ const Products = () => {
   };
   return (
     <div>
-      {!products ? (
+      {status === "LOADING" ? (
         <div>Loading...</div>
       ) : (
         <ul className="products">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <li key={product._id}>
               <div className="product">
                 <a href={"#" + product._id} onClick={() => openModal(product)}>
@@ -34,8 +46,8 @@ const Products = () => {
                 <div className="product-price">
                   <div>{formatCurrency(product.price)}</div>
                   <button
-                    onClick={() => dispatch(addToCart(product))}
                     className="button primary"
+                    onClick={() => dispatch(addToCart(product))}
                   >
                     Add to Cart
                   </button>
@@ -51,41 +63,43 @@ const Products = () => {
           onRequestClose={closeModal}
           ariaHideApp={false}
         >
-          <button className="close-modal" onClick={closeModal}>
-            X
-          </button>
-          <div className="product-details">
-            <img src={product.image} alt={product.title} />
-            <div className="product-details-description">
-              <p>
-                <strong>{product.title}</strong>
-              </p>
-              <p>{product.description}</p>
-              <p>
-                Available Sizes:{" "}
-                {product.availableSizes.map((x, index) => (
-                  <span>
-                    {" "}
-                    <button className="button" key={index}>
-                      {x}
-                    </button>
-                  </span>
-                ))}
-              </p>
-              <div className="product-price">
-                <div>Price: {formatCurrency(product.price)}</div>
-                <button
-                  className="button primary"
-                  onClick={() => {
-                    dispatch(addToCart(product));
-                    closeModal();
-                  }}
-                >
-                  Add to Cart
-                </button>
+          <Zoom>
+            <button className="close-modal" onClick={closeModal}>
+              X
+            </button>
+            <div className="product-details">
+              <img src={product.image} alt={product.title} />
+              <div className="product-details-description">
+                <p>
+                  <strong>{product.title}</strong>
+                </p>
+                <p>{product.description}</p>
+                <p>
+                  Available Sizes:{" "}
+                  {product.availableSizes.map((x, index) => (
+                    <span key={index}>
+                      {" "}
+                      <button className="button" key={index}>
+                        {x}
+                      </button>
+                    </span>
+                  ))}
+                </p>
+                <div className="product-price">
+                  <div>Price: {formatCurrency(product.price)}</div>
+                  <button
+                    className="button primary"
+                    onClick={() => {
+                      closeModal();
+                      dispatch(addToCart(product));
+                    }}
+                  >
+                    Add to Cart
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          </Zoom>
         </Modal>
       )}
     </div>

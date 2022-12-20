@@ -1,11 +1,11 @@
 const express = require("express");
-const favicon = require("express-favicon");
 const mongoose = require("mongoose");
 const path = require("path");
+const cors = require("cors");
 require("dotenv/config");
 
 const app = express();
-app.use(favicon(__dirname + "/build/favicon.ico"));
+app.use(cors());
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, "build")));
 
@@ -17,9 +17,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/api/products", require("./routes/products"));
 app.use("/api/order", require("./routes/order"));
 
-app.get("/*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
-});
+// app.get("/*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "build", "index.html"));
+// });
 //connect to mongodb atlas
 mongoose.connect(process.env.DB_CONNECTION, () => {
   console.log("connected to database");
